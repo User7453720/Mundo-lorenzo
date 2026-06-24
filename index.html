@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>El Mundo de Lorenzo ⚽</title>
+<style>
+  :root{
+    --amarillo:#FFD60A; --amarillo-claro:#FFF3B0; --amarillo-oscuro:#FFB703;
+    --azul:#0353A4; --azul-osc:#012A60; --rojo:#E63946; --verde:#2A9D8F;
+    --tinta:#16213A; --blanco:#FFFEF7; --sombra:0 6px 0 rgba(0,0,0,.12);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Trebuchet MS','Segoe UI',Verdana,sans-serif;background:var(--amarillo-claro);color:var(--tinta);line-height:1.5;overflow-x:hidden;}
+
+  header{background:linear-gradient(135deg,var(--amarillo),var(--amarillo-oscuro));text-align:center;padding:26px 16px 20px;border-bottom:6px solid var(--azul);}
+  header h1{font-size:clamp(2rem,8vw,3.6rem);color:var(--azul-osc);text-shadow:2px 2px 0 #fff,4px 4px 0 rgba(0,0,0,.15);}
+  header p{font-size:clamp(.95rem,4vw,1.3rem);color:var(--tinta);font-weight:bold;margin-top:6px;}
+  .balon{display:inline-block;animation:bota 1.2s ease-in-out infinite;}
+  @keyframes bota{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+
+  nav{position:sticky;top:0;z-index:100;background:var(--azul);display:flex;overflow-x:auto;gap:6px;padding:10px;scrollbar-width:none;box-shadow:0 4px 10px rgba(0,0,0,.2);}
+  nav::-webkit-scrollbar{display:none;}
+  .tab{flex:0 0 auto;background:var(--blanco);color:var(--azul-osc);border:3px solid var(--azul-osc);border-radius:30px;padding:10px 16px;font-size:1rem;font-weight:bold;font-family:inherit;cursor:pointer;white-space:nowrap;transition:transform .12s;min-height:44px;}
+  .tab:hover{transform:scale(1.05);}
+  .tab.activa{background:var(--amarillo);transform:scale(1.05);box-shadow:var(--sombra);}
+
+  main{max-width:960px;margin:0 auto;padding:18px 14px 60px;}
+  .pagina{display:none;animation:aparece .4s ease;}
+  .pagina.activa{display:block;}
+  @keyframes aparece{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+  h2.titulo{font-size:clamp(1.5rem,6vw,2.3rem);color:var(--azul-osc);margin:6px 0 16px;text-shadow:1px 1px 0 var(--amarillo);}
+  .grupo-pos{font-size:clamp(1.2rem,5vw,1.6rem);color:var(--azul-osc);margin:18px 0 10px;border-bottom:4px dotted var(--amarillo-oscuro);padding-bottom:4px;}
+
+  .tarjeta{background:var(--blanco);border:4px solid var(--amarillo-oscuro);border-radius:22px;padding:18px;margin-bottom:18px;box-shadow:var(--sombra);}
+  .tarjeta h3{color:var(--rojo);font-size:clamp(1.15rem,5vw,1.5rem);margin-bottom:8px;}
+  .tarjeta p{font-size:clamp(1rem,4vw,1.1rem);margin-bottom:8px;}
+  .tarjeta ul{margin:8px 0 8px 22px;} .tarjeta li{margin-bottom:6px;font-size:clamp(1rem,4vw,1.1rem);}
+
+  .dato{background:var(--amarillo-claro);border-left:6px solid var(--azul);border-radius:10px;padding:10px 14px;margin:10px 0;font-weight:bold;}
+  .dato::before{content:"💡 ";}
+  .foto{font-size:clamp(3.5rem,18vw,6rem);text-align:center;background:linear-gradient(135deg,var(--amarillo-claro),#fff);border-radius:16px;padding:14px;margin:10px 0;border:3px dashed var(--amarillo-oscuro);}
+
+  .pasos{counter-reset:paso;list-style:none;margin-left:0!important;}
+  .pasos li{position:relative;padding:12px 12px 12px 56px;background:var(--amarillo-claro);border-radius:14px;margin-bottom:10px;list-style:none;}
+  .pasos li::before{counter-increment:paso;content:counter(paso);position:absolute;left:12px;top:50%;transform:translateY(-50%);background:var(--rojo);color:#fff;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:1.1rem;}
+
+  /* ----- JUGADORES ----- */
+  .jgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-bottom:10px;}
+  .jcard{background:var(--blanco);border:3px solid var(--amarillo-oscuro);border-radius:18px;overflow:hidden;box-shadow:var(--sombra);transition:transform .12s;}
+  .jcard:hover{transform:translateY(-4px);}
+  .jfoto{position:relative;width:100%;aspect-ratio:1/1;background:var(--amarillo-claro);}
+  .jfoto img{width:100%;height:100%;object-fit:cover;display:block;}
+  .jdorsal{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:3.5rem;font-weight:bold;color:#fff;}
+  .jinfo{padding:10px;text-align:center;}
+  .jnum{font-size:1.2rem;font-weight:bold;}
+  .jinfo h4{font-size:1rem;color:var(--azul-osc);margin:2px 0 6px;}
+  .jpos{display:inline-block;color:#fff;font-size:.75rem;font-weight:bold;padding:3px 10px;border-radius:20px;margin-bottom:6px;}
+  .jclub{font-size:.8rem;color:var(--tinta);margin-bottom:6px;}
+  .jinfo p{font-size:.85rem;margin:0;}
+
+  /* ----- QUIZ ----- */
+  #marcador{background:var(--azul);color:#fff;border-radius:16px;padding:12px;text-align:center;font-size:1.2rem;font-weight:bold;margin-bottom:16px;}
+  .pregunta-num{color:var(--rojo);font-weight:bold;margin-bottom:6px;}
+  .opcion{display:block;width:100%;text-align:left;background:var(--blanco);border:3px solid var(--azul);border-radius:14px;padding:14px;margin-bottom:10px;font-size:1.05rem;font-family:inherit;font-weight:bold;color:var(--tinta);cursor:pointer;transition:transform .1s;min-height:44px;}
+  .opcion:hover{transform:scale(1.02);background:var(--amarillo-claro);}
+  .opcion.correcta{background:#9BE6A0;border-color:#1B7E2E;}
+  .opcion.incorrecta{background:#FFB3B3;border-color:var(--rojo);}
+  .opcion:disabled{cursor:default;}
+  .btn{background:var(--amarillo);border:4px solid var(--azul-osc);border-radius:30px;padding:14px 26px;font-size:1.15rem;font-weight:bold;font-family:inherit;color:var(--azul-osc);cursor:pointer;display:block;margin:14px auto 0;box-shadow:var(--sombra);transition:transform .12s;min-height:44px;}
+  .btn:hover{transform:scale(1.05);}
+  #resultado{text-align:center;} #resultado .foto{font-size:5rem;} #resultado h3{font-size:1.6rem;color:var(--azul-osc);margin:10px 0;}
+
+  /* ----- CUENTOS ----- */
+  .cuentos-lista{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;}
+  .cuento-btn{display:flex;align-items:center;gap:10px;text-align:left;background:var(--blanco);border:3px solid var(--amarillo-oscuro);border-radius:16px;padding:14px;font-size:1rem;font-weight:bold;font-family:inherit;color:var(--azul-osc);cursor:pointer;box-shadow:var(--sombra);transition:transform .12s;min-height:44px;}
+  .cuento-btn:hover{transform:scale(1.03);background:var(--amarillo-claro);}
+  .cuento-emoji{font-size:2rem;flex:0 0 auto;}
+
+  /* modal cuento */
+  #modal{display:none;position:fixed;inset:0;z-index:200;background:rgba(1,42,96,.85);padding:16px;overflow-y:auto;}
+  #modal.abierto{display:flex;align-items:flex-start;justify-content:center;}
+  .modal-box{background:var(--blanco);border:5px solid var(--amarillo);border-radius:24px;max-width:680px;width:100%;margin:auto;padding:24px;box-shadow:0 10px 40px rgba(0,0,0,.4);}
+  .modal-box .cemoji{font-size:4rem;text-align:center;}
+  .modal-box h3{color:var(--rojo);font-size:clamp(1.4rem,6vw,2rem);text-align:center;margin:6px 0 16px;}
+  .modal-box p{font-size:clamp(1.05rem,4.5vw,1.25rem);line-height:1.7;margin-bottom:14px;}
+  .cerrar{background:var(--rojo);color:#fff;border:none;border-radius:50%;width:46px;height:46px;font-size:1.5rem;font-weight:bold;cursor:pointer;float:right;line-height:1;}
+
+  footer{text-align:center;padding:20px;color:var(--azul-osc);font-weight:bold;font-size:.95rem;}
+  @media (min-width:600px){ .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;} .grid2 .tarjeta{margin-bottom:0;} }
+</style>
+</head>
+<body>
+
+<header>
+  <h1><span class="balon">⚽</span> El Mundo de Lorenzo</h1>
+  <p>Fútbol, curiosidades, cuentos y mucha diversión</p>
+</header>
+
+<nav id="nav">
+  <button class="tab activa" data-pag="inicio">🏠 Inicio</button>
+  <button class="tab" data-pag="messi">🐐 Messi</button>
+  <button class="tab" data-pag="seleccion">🇪🇸 La Selección</button>
+  <button class="tab" data-pag="futbol">⚽ Fútbol</button>
+  <button class="tab" data-pag="comohace">🍫 ¿Cómo se hace?</button>
+  <button class="tab" data-pag="animales">🦖 Animales y Dinos</button>
+  <button class="tab" data-pag="curiosi">🤯 Curiosidades</button>
+  <button class="tab" data-pag="cuentos">📚 Cuentos</button>
+  <button class="tab" data-pag="quiz">🎮 Quiz</button>
+</nav>
+
+<main>
+
+  <!-- INICIO -->
+  <section class="pagina activa" id="inicio">
+    <div class="foto">👦⚽🏆</div>
+    <h2 class="titulo">¡Hola, Lorenzo!</h2>
+    <div class="tarjeta">
+      <h3>Esta es tu web</h3>
+      <p>Aquí tienes todo lo que más te gusta: Leo Messi, los jugadores de la Selección Española, cómo se hacen un montón de cosas, animales, dinosaurios, curiosidades, 20 cuentos para leer y un quiz de fútbol.</p>
+      <p>Usa las <b>pestañas de arriba</b> para ir de una sección a otra. ¡A explorar!</p>
+    </div>
+    <div class="grid2">
+      <div class="tarjeta"><h3>🐐 Messi</h3><p>Descubre todo sobre el mejor jugador del mundo.</p></div>
+      <div class="tarjeta"><h3>🇪🇸 La Selección</h3><p>Conoce a los 26 jugadores del Mundial 2026.</p></div>
+    </div>
+    <div class="grid2">
+      <div class="tarjeta"><h3>📚 Cuentos</h3><p>20 cuentos cortitos para leer antes de dormir.</p></div>
+      <div class="tarjeta"><h3>🎮 Quiz</h3><p>Pon a prueba lo que sabes de fútbol.</p></div>
+    </div>
+  </section>
+
+  <!-- MESSI -->
+  <section class="pagina" id="messi">
+    <h2 class="titulo">🐐 Leo Messi</h2>
+    <div class="foto">🐐🇦🇷⚽</div>
+    <div class="tarjeta"><h3>¿Quién es Leo Messi?</h3><ul><li>Se llama Lionel Andrés Messi y nació en una ciudad de Argentina llamada Rosario.</li><li>De pequeño era bajito, pero ya regateaba mejor que nadie.</li><li>Es zurdo: hace casi toda la magia con su pierna izquierda.</li><li>Muchos dicen que es el mejor futbolista de la historia.</li></ul></div><div class="tarjeta"><h3>Sus comienzos</h3><ul><li>Empezó a jugar con una pelota cuando era muy chiquitín, casi un bebé.</li><li>El FC Barcelona se lo llevó a España siendo un niño para que jugara en La Masia.</li><li>Su primer contrato lo firmaron en una servilleta de papel, ¡de verdad!</li><li>Trabajó muchísimo cada día para llegar a ser tan bueno.</li></ul></div><div class="tarjeta"><h3>Sus récords increíbles</h3><ul><li>Ganó 8 Balones de Oro, el premio al mejor jugador del mundo. ¡Nadie tiene tantos!</li><li>Marcó más de 600 goles con el FC Barcelona.</li><li>Es el jugador con más goles en la historia del Barça.</li><li>Ha marcado goles de todas las formas: de penalti, de falta, regateando a todos…</li></ul></div><div class="tarjeta"><h3>El Mundial 2022</h3><ul><li>Con la selección de Argentina ganó el Mundial de 2022 en Catar.</li><li>Era el sueño de toda su vida y lo consiguió.</li><li>Levantó la copa más importante del fútbol mientras todo su país lloraba de alegría.</li><li>Ese día se convirtió en un héroe para millones de niños.</li></ul></div><div class="tarjeta"><h3>¿Por qué le llaman &#x27;La Pulga&#x27;?</h3><ul><li>De pequeño era muy bajito, por eso le pusieron el apodo cariñoso de &#x27;La Pulga&#x27;.</li><li>Aunque era pequeño, era rapidísimo y muy difícil de parar.</li><li>Demostró que el tamaño no importa: lo importante es el corazón y el esfuerzo.</li><li>Hoy es un gigante del fútbol, aunque le sigan llamando &#x27;La Pulga&#x27;.</li></ul></div>
+    <div class="dato">Messi demuestra que con esfuerzo, ilusión y trabajo, los sueños se cumplen.</div>
+  </section>
+
+  <!-- SELECCIÓN -->
+  <section class="pagina" id="seleccion">
+    <h2 class="titulo">🇪🇸 La Selección Española</h2>
+    <div class="tarjeta">
+      <p>Estos son los <b>26 jugadores</b> de "La Roja" para el Mundial 2026, que se juega en Estados Unidos, México y Canadá. ¡A por la segunda estrella! 🌟</p>
+    </div>
+    <h3 class="grupo-pos">🧤 Porteros</h3><div class="jgrid">
+      <div class="jcard">
+        <div class="jfoto">
+          <img src="fotos/unai-simon.jpg" alt="Unai Simón" loading="lazy"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="jdorsal" style="background:#FFB703;display:none;">1</div>
+        </div>
+        <div class="jinfo">
+          <div class="jnum" style="color:#FFB703;">#1</div>
+          <h4>Unai Simón</h4>
+          <div class="jpos" style="background:#FFB703;">Portero</div>
+          <div class="jclub">🏟️ Athletic Club</div>
+          <p>Para los penaltis es un muro. ¡Vuela de palo a palo!</p>
+        </div>
+      </div>
+      <div class="jcard">
+        <div class="jfoto">
+          <img src="fotos/david-raya.jpg" alt="David Raya" loading="lazy"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="jdorsal" style="background:#FFB703;display:none;">23</div>
+        </div>
+        <div class="jinfo">
+          <div class="jnum" style="color:#FFB703;">#23</div>
+          <h4>David Raya</h4>
+          <div class="jpos" style="background:#FFB703;">Portero</div>
+          <div class="jclub">🏟️ Arsenal</div>
+          <p>Juega en Inglaterra y es muy bueno con los pies.</p>
+        </div>
+      </div>
+      <div class="jcard">
+        <div class="jfoto">
+          <img src="fotos/joan-garcia.jpg" alt="Joan García" loading="lazy"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="jdorsal" style="background:#FFB703;display:none;">13</div>
+        </div>
+        <div class="jinfo">
+          <div class="jnum" style="color:#FFB703;">#13</div>
+          <h4>Joan García</h4>
+          <div class="jpos" style="background:#FFB703;">Portero</div>
+          <div class="jclub">🏟️ FC Barcelona</div>
+          <p>Portero joven del Barça con reflejos rapidísimos.</p>
+        </div>
+      </div></div><h3 class="grupo-pos">🛡️ Defensas</h3><div class="jgrid">
+      <div class="jcard">
+        <div class="jfoto">
+          <img src="fotos/marcos-llorente.jpg" alt="Marcos Llorente" loading="lazy"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="jdorsal" style="background:#0353A4;display:none;">14</div>
+        </div>
+        <div class="jinfo">
+          <div class="jnum" style="color:#0353A4;">#14</div>
+          <h4>Marcos Llorente</h4>
+          <div class="jpos" style="background:#0353A4;">Defensa</div>
+          <div class="jclub">🏟️ Atlético de Madrid</div>
+          <p>Corre muchísimo, parece que no se cansa nunca.</p>
+        </div>
+      </div>
+      <div class="jcard">
+        <div class="jfoto">
+          <img src="fotos/pedro-porro.jpg" alt="Pedro Porro" loading="lazy"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="jdorsal" style="background:#0353A4;display:none;">2</div>
+        </div>
+        <div class="jinfo">
+          <div class="jnum" style="color:#0353A4;">#2</div>
+          <h4>Pedro Porro</h4>
+          <div class="jpos" style="background:#0353A4;">Defensa</div>
+          <div class="jclub">🏟️ Tottenham</div>
+          <p>Sube por la banda derecha y pone centros muy buenos.</p>
+        </div>
+      </div>
+      <div class="jcard">
+        <div class="jfoto">
+          <img src="fotos/eric-garcia.jpg" alt="Eric García" loading="lazy"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="jdorsal" style="background:#0353A4;display:none;">4</div>
+        </div>
+        <div class="jinfo">
+          <div class="jnum" style="color:#0353A4;">#4</div>
+          <h4>Eric García</h4>
+          <div class="jpos" style="background:#0353A4;">Defensa</div>
+          <div class="jclub">🏟️ FC Barcelona</div>
+          <p>Defensa del Barça, muy listo colocándose.</p>
+        </div>
+      </div>
+      <div class="jcard">
+        <div class="jfoto">
+          <img src="fotos/marc-pubill.jpg" alt="Marc Pubill" loading="lazy"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="jdorsal" style="background:#0353A4;display:none;">22</div>
+        </div>
+        <div class="jinfo">
+          <div class="jnum" style="color:#0353A4;">#22</div>
+          <h4>Marc Pubill</h4>
+          <div class="jpos" style="background:#0353A4;">Defensa</div>
+          <div class="jclub">🏟️ Atlético de Madrid</div>
+          <p>Una de las caras nuevas del equipo.</p>
+        </div>
+      </div>
+      <div class="jcard">
+        <div class="jfoto">
+          <img src="fotos/aymeric-laporte.jpg" alt="Aymeric Laporte" loading="lazy"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="jdorsal" style="background:#0353A4;display:none;">6</div>
+        </div>
+        <div class="jinfo">
+          <div class="jnum" style="color:#0353A4;">#6</div>
+          <h4>Aymeric Laporte</h4>
+          <div class="jpos" style="background:#0353A4;">Defensa</div>
+          <div class="jclub">🏟️ Athletic Club</div>
+          <p>Es alto y fuerte, gana casi todos los balones de cabeza.</p>
+        </div>
+      </div>
+      <div class="jcard">
+        <div class="jfoto">
+          <img src="fotos/pau-cubarsi.jpg" alt="Pau Cubarsí" loading="lazy"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="jdorsal" style="background:#0353A4;display:none;">5</div>
+        </div>
+        <div class="jinfo">
+          <div class="jnum" style="color:#0353A4;">#5</div>
+          <h4>Pau Cubarsí</h4>
+          <div class="jpos" style="background:#0353A4;">Defensa</div>
+          <div class="jclub">🏟️ FC Barcelona</div>
+          <p>¡Muy jovencito! Central del Barça que apunta a crack.</p>
+        </div>
+      </div>
+      <div class="jcard">
+        <div class="jfoto">
+          <img src="fotos/marc-cucurella.jpg" alt="Marc Cucurella" loading="lazy"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="jdorsal" style="background:#0353A4;display:none;">24</div>
+        </div>
+        <div class="jinfo">
+          <div class="jnum" style="color:#0353A4;">#24</div>
+          <h4>Marc Cucurella</h4>
+          <div class="jpos" style="background:#0353A4;">Defensa</div>
+          <div class="jclub">🏟️ Chelsea</div>
+          <p>Se le reconoce por su pelo rizado. Defiende por la izquierda.</p>
+        </div>
+      </div>
+      <div class="jcard">
+        <div class="jfoto">
+          <img src="fotos/alejandro-grimaldo.jpg" alt="Alejandro Grimaldo" loading="lazy"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="jdorsal" style="background:#0353A4;display:none;">3</div>
+        </div>
+        <div class="jinfo">
+          <div class="jnum" style="color:#0353A4;">#3</div>
+          <h4>Alejandro Grimaldo</h4>
+          <div class="jpos" style="background:#0353A4;">Defensa</div>
+          <div class="jclub">🏟️ Bayer Leverkusen</div>
+          <p>Lateral izquierdo que chuta las faltas muy bien.</p>
+        </div>
+      </div></div><h3 class="grupo-pos">🎯 Centrocampistas</h3><div class="jgrid">
+      <div class="jcard">
+        <div class="jfoto">
+          <img src="fotos/pedri.jpg" alt="Pedri" loading="lazy"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="jdorsal" style="background:#2A9D8F;display:none;">8</div>
+        </div>
+        <div class="jinfo">
+          <div class="jnum" style="color:#2A9D8F;">#8</div>
+          <h4>Pedri</h4>
+          <div class="jpos" style="background:#2A9D8F;">Centrocampista</div>
+          <div class="jclub">🏟️ FC Barcelona</div>
+          <p>Mueve el balón como nadie. ¡El cerebro del equipo!</p>
+        </div>
+      </div>
+      <div class="jcard">
+        <div class="jfoto">
+          <img src="fotos/fabian-ruiz.jpg" alt="Fabián Ruiz" loading="lazy"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="jdorsal" style="background:#2A9D8F;display:none;">12</div>
+        </div>
+        <div class="jinfo">
+          <div class="jnum" style="color:#2A9D8F;">#12</div>
+          <h4>Fabián Ruiz</h4>
+          <div class="jpos" style="background:#2A9D8F;">Centrocampista</div>
+          <div class="jclub">🏟️ Paris Saint-Germain</div>
+          <p>Alto y elegante con el balón en los pies.</p>
+        </div>
+      </div>
+      <div class="jcard">
+        <div class="jfoto">
+          <img src="fotos/martin-zubimendi.jpg" alt="Martín Zubimendi" loading="lazy"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="jdorsal" style="background:#2A9D8F;display:none;">18</div>
+        </div>
+        <div class="jinfo">
+          <div class="jnum" style="color:#2A9D8F;">#18</div>
+          <h4>Martín Zubimendi</h4>
+          <div class="jpos" style="background:#2A9D8F;">Centrocampista</div>
+          <div class="jclub">🏟️ Arsenal</div>
+          <p>Recupera balones y los reparte. Muy trabajador.</p>
+        </div>
+      </div>
+      <div class="jcard">
+        <div class="jfoto">
+          <img src="fotos/gavi.jpg" alt="Gavi" loading="lazy"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="jdorsal" style="background:#2A9D8F;display:none;">9</div>
+        </div>
+        <div class="jinfo">
+          <div class="jnum" style="color:#2A9D8F;">#9</div>
+          <h4>Gavi</h4>
+          <div class="jpos" style="background:#2A9D8F;">Centrocampista</div>
+          <div class="jclub">🏟️ FC Barcelona</div>
+          <p>Pura energía. Lucha cada balón como si fuera el último.</p>
+        </div>
+      </div>
+      <div class="jcard">
+        <div class="jfoto">
+          <img src="fotos/rodri.jpg" alt="Rodri" loading="lazy"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="jdorsal" style="background:#2A9D8F;display:none;">16</div>
+        </div>
+        <div class="jinfo">
+          <div class="jnum" style="color:#2A9D8F;">#16</div>
+          <h4>Rodri</h4>
+          <div class="jpos" style="background:#2A9D8F;">Centrocampista</div>
+          <div class="jclub">🏟️ Manchester City</div>
+          <p>Ganó el Balón de Oro. ¡El mejor en su puesto del mundo!</p>
+        </div>
+      </div>
+      <div class="jcard">
+        <div class="jfoto">
+          <img src="fotos/alex-baena.jpg" alt="Álex Baena" loading="lazy"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="jdorsal" style="background:#2A9D8F;display:none;">20</div>
+        </div>
+        <div class="jinfo">
+          <div class="jnum" style="color:#2A9D8F;">#20</div>
+          <h4>Álex Baena</h4>
+          <div class="jpos" style="background:#2A9D8F;">Centrocampista</div>
+          <div class="jclub">🏟️ Atlético de Madrid</div>
+          <p>Tiene una zurda mágica para los pases.</p>
+        </div>
+      </div>
+      <div class="jcard">
+        <div class="jfoto">
+          <img src="fotos/mikel-merino.jpg" alt="Mikel Merino" loading="lazy"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="jdorsal" style="background:#2A9D8F;display:none;">15</div>
+        </div>
+        <div class="jinfo">
+          <div class="jnum" style="color:#2A9D8F;">#15</div>
+          <h4>Mikel Merino</h4>
+          <div class="jpos" style="background:#2A9D8F;">Centrocampista</div>
+          <div class="jclub">🏟️ Arsenal</div>
+          <p>Alto y goleador. Aparece para rematar de cabeza.</p>
+        </div>
+      </div></div><h3 class="grupo-pos">⚡ Delanteros</h3><div class="jgrid">
+      <div class="jcard">
+        <div class="jfoto">
+          <img src="fotos/mikel-oyarzabal.jpg" alt="Mikel Oyarzabal" loading="lazy"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="jdorsal" style="background:#E63946;display:none;">21</div>
+        </div>
+        <div class="jinfo">
+          <div class="jnum" style="color:#E63946;">#21</div>
+          <h4>Mikel Oyarzabal</h4>
+          <div class="jpos" style="background:#E63946;">Delantero</div>
+          <div class="jclub">🏟️ Real Sociedad</div>
+          <p>Marcó el gol que ganó la Eurocopa 2024. ¡Un héroe!</p>
+        </div>
+      </div>
+      <div class="jcard">
+        <div class="jfoto">
+          <img src="fotos/dani-olmo.jpg" alt="Dani Olmo" loading="lazy"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="jdorsal" style="background:#E63946;display:none;">10</div>
+        </div>
+        <div class="jinfo">
+          <div class="jnum" style="color:#E63946;">#10</div>
+          <h4>Dani Olmo</h4>
+          <div class="jpos" style="background:#E63946;">Delantero</div>
+          <div class="jclub">🏟️ FC Barcelona</div>
+          <p>Aparece por sorpresa y mete goles importantes.</p>
+        </div>
+      </div>
+      <div class="jcard">
+        <div class="jfoto">
+          <img src="fotos/nico-williams.jpg" alt="Nico Williams" loading="lazy"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="jdorsal" style="background:#E63946;display:none;">17</div>
+        </div>
+        <div class="jinfo">
+          <div class="jnum" style="color:#E63946;">#17</div>
+          <h4>Nico Williams</h4>
+          <div class="jpos" style="background:#E63946;">Delantero</div>
+          <div class="jclub">🏟️ Athletic Club</div>
+          <p>Rapidísimo por la banda. ¡Imposible de parar!</p>
+        </div>
+      </div>
+      <div class="jcard">
+        <div class="jfoto">
+          <img src="fotos/yeremy-pino.jpg" alt="Yeremy Pino" loading="lazy"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="jdorsal" style="background:#E63946;display:none;">11</div>
+        </div>
+        <div class="jinfo">
+          <div class="jnum" style="color:#E63946;">#11</div>
+          <h4>Yeremy Pino</h4>
+          <div class="jpos" style="background:#E63946;">Delantero</div>
+          <div class="jclub">🏟️ Crystal Palace</div>
+          <p>Driblador habilidoso que encara sin miedo.</p>
+        </div>
+      </div>
+      <div class="jcard">
+        <div class="jfoto">
+          <img src="fotos/ferran-torres.jpg" alt="Ferran Torres" loading="lazy"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="jdorsal" style="background:#E63946;display:none;">7</div>
+        </div>
+        <div class="jinfo">
+          <div class="jnum" style="color:#E63946;">#7</div>
+          <h4>Ferran Torres</h4>
+          <div class="jpos" style="background:#E63946;">Delantero</div>
+          <div class="jclub">🏟️ FC Barcelona</div>
+          <p>Olfato de gol: siempre está donde hay que estar.</p>
+        </div>
+      </div>
+      <div class="jcard">
+        <div class="jfoto">
+          <img src="fotos/borja-iglesias.jpg" alt="Borja Iglesias" loading="lazy"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="jdorsal" style="background:#E63946;display:none;">26</div>
+        </div>
+        <div class="jinfo">
+          <div class="jnum" style="color:#E63946;">#26</div>
+          <h4>Borja Iglesias</h4>
+          <div class="jpos" style="background:#E63946;">Delantero</div>
+          <div class="jclub">🏟️ Celta de Vigo</div>
+          <p>Delantero centro con mucha puntería.</p>
+        </div>
+      </div>
+      <div class="jcard">
+        <div class="jfoto">
+          <img src="fotos/victor-munoz.jpg" alt="Víctor Muñoz" loading="lazy"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="jdorsal" style="background:#E63946;display:none;">25</div>
+        </div>
+        <div class="jinfo">
+          <div class="jnum" style="color:#E63946;">#25</div>
+          <h4>Víctor Muñoz</h4>
+          <div class="jpos" style="background:#E63946;">Delantero</div>
+          <div class="jclub">🏟️ Osasuna</div>
+          <p>Joven promesa que se estrena con la selección.</p>
+        </div>
+      </div>
+      <div class="jcard">
+        <div class="jfoto">
+          <img src="fotos/lamine-yamal.jpg" alt="Lamine Yamal" loading="lazy"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="jdorsal" style="background:#E63946;display:none;">19</div>
+        </div>
+        <div class="jinfo">
+          <div class="jnum" style="color:#E63946;">#19</div>
+          <h4>Lamine Yamal</h4>
+          <div class="jpos" style="background:#E63946;">Delantero</div>
+          <div class="jclub">🏟️ FC Barcelona</div>
+          <p>¡Una estrella jovencísima! Regatea y marca como los grandes.</p>
+        </div>
+      </div></div>
+    <div class="dato">El entrenador (seleccionador) es Luis de la Fuente. ¡Él decide quién juega!</div>
+  </section>
+
+  <!-- FÚTBOL -->
+  <section class="pagina" id="futbol">
+    <h2 class="titulo">⚽ Fútbol</h2>
+    <div class="tarjeta">
+      <div class="foto">🔵🔴</div>
+      <h3>FC Barcelona</h3>
+      <p>El Barça es uno de los clubes más famosos del mundo. Juega de azul y grana en un estadio enorme, el Spotify Camp Nou.</p>
+      <ul><li>Su lema es <b>"Més que un club"</b> (Más que un club).</li><li>Tiene una escuela de jóvenes llamada <b>La Masia</b>, donde se formó Messi.</li></ul>
+    </div>
+    <div class="tarjeta">
+      <div class="foto">🇪🇸🏆</div>
+      <h3>La Selección Española</h3>
+      <p>"La Roja" es el equipo de toda España. ¡Cuando juega, todo el país anima a la vez!</p>
+      <ul><li>Ganó el <b>Mundial de 2010</b>.</li><li>Ganó la <b>Eurocopa de 2024</b>.</li><li>Es famosa por pasarse mucho el balón ("tiki-taka").</li></ul>
+    </div>
+    <div class="tarjeta">
+      <h3>📏 Las reglas básicas</h3>
+      <ul><li>Juegan <b>11 contra 11</b>.</li><li>Gana quien meta más goles.</li><li>Un partido dura <b>90 minutos</b> (dos partes de 45).</li><li>Tarjeta amarilla = aviso. Roja = fuera del campo.</li></ul>
+    </div>
+  </section>
+
+  <!-- CÓMO SE HACE -->
+  <section class="pagina" id="comohace">
+    <h2 class="titulo">🍫 ¿Cómo se hace?</h2>
+    
+      <div class="tarjeta">
+        <div class="foto">🍫🥜</div>
+        <h3>La crema de cacao (tipo Nutella)</h3>
+        <p>Esa crema marrón tan rica que untas en el pan se hace con pocas cosas, ¡pero hay un truco!</p>
+        <ol class="pasos"><li>Se cogen muchas avellanas y se tuestan en un horno hasta que huelen riquísimo.</li><li>Se trituran las avellanas hasta convertirlas en una pasta blandita.</li><li>Se añade azúcar para que esté dulce y cacao en polvo para el color y el sabor a chocolate.</li><li>Se mezcla con un poquito de aceite y leche en polvo para que quede suave.</li><li>Se bate todo muchísimo hasta que queda una crema brillante. ¡Lista para untar!</li></ol>
+        <div class="dato">El ingrediente estrella es la avellana. ¡Por eso huele tan bien al abrir el bote!</div>
+      </div>
+      <div class="tarjeta">
+        <div class="foto">🍫🌳</div>
+        <h3>El chocolate</h3>
+        <p>¿Sabías que el chocolate empieza siendo… una semilla en un árbol? ¡De verdad!</p>
+        <ol class="pasos"><li>En países calurosos crece el árbol del cacao, que da unos frutos grandes con semillas dentro.</li><li>Se abren los frutos y se sacan las semillas (las llaman &#x27;granos de cacao&#x27;).</li><li>Las semillas se dejan secar al sol durante varios días.</li><li>Se tuestan y se trituran hasta hacer una pasta marrón.</li><li>Se mezcla con azúcar (y con leche si es chocolate con leche).</li><li>Se vierte en moldes con forma de tableta y se mete en el frío para que se endurezca.</li></ol>
+        <div class="dato">El chocolate blanco no lleva cacao en polvo, por eso es de color claro.</div>
+      </div>
+      <div class="tarjeta">
+        <div class="foto">⚽🪡</div>
+        <h3>Un balón de fútbol</h3>
+        <p>Un balón parece sencillo, pero está hecho de muchos trozos unidos con cuidado.</p>
+        <ol class="pasos"><li>Se cortan piezas de un material resistente: los clásicos pentágonos negros y hexágonos blancos.</li><li>Se cosen o se pegan una a una para formar una bola perfecta.</li><li>Por dentro lleva una cámara de aire, como un globo fuerte.</li><li>Se infla con una bomba hasta que está duro y rebota bien.</li><li>Se comprueba que es redondo y… ¡a chutar!</li></ol>
+        <div class="dato">Los pentágonos y hexágonos hacen que el balón sea casi una esfera perfecta.</div>
+      </div>
+      <div class="tarjeta">
+        <div class="foto">🍦❄️</div>
+        <h3>El helado</h3>
+        <p>El helado es frío y cremoso, ¡y no es solo agua congelada! Tiene un secreto.</p>
+        <ol class="pasos"><li>Se mezcla leche, nata, azúcar y el sabor que quieras (fresa, vainilla, chocolate…).</li><li>Se calienta un poco para que todo se junte bien.</li><li>Ahora viene el truco: se va removiendo MIENTRAS se enfría muy frío.</li><li>Al removerlo, no se hacen cristales grandes de hielo y queda cremoso.</li><li>Se guarda en el congelador hasta que está bien duro.</li></ol>
+        <div class="dato">Si no se removiera, el helado quedaría duro como un cubito de hielo.</div>
+      </div>
+      <div class="tarjeta">
+        <div class="foto">🍊🥤</div>
+        <h3>La naranjada (tipo Fanta)</h3>
+        <p>Esa bebida naranja con burbujas se hace mezclando varias cosas en una fábrica.</p>
+        <ol class="pasos"><li>Se parte del zumo o el sabor de naranja.</li><li>Se mezcla con agua bien limpia y azúcar para que esté dulce.</li><li>Se añade el color naranja y el sabor a naranja.</li><li>Aquí está la magia: se mete gas (las burbujas) a presión en el líquido.</li><li>Se cierra rápido la botella o la lata para que las burbujas no se escapen.</li></ol>
+        <div class="dato">Las burbujas son gas. Por eso, cuando agitas la lata, ¡sale espuma al abrirla!</div>
+      </div>
+      <div class="tarjeta">
+        <div class="foto">🫧🥤</div>
+        <h3>La gaseosa y los refrescos con burbujas</h3>
+        <p>¿Por qué hacen &#x27;fsss&#x27; los refrescos? ¡Por las burbujas! Así se meten dentro.</p>
+        <ol class="pasos"><li>Se prepara agua con azúcar y el sabor que se quiera.</li><li>Se enfría mucho el líquido, porque el gas entra mejor cuando está frío.</li><li>Se mete un gas especial (dióxido de carbono) a presión.</li><li>El gas se queda atrapado dentro del líquido formando burbujitas.</li><li>Se embotella cerrado para que las burbujas no escapen hasta que abres la botella.</li></ol>
+        <div class="dato">Cuando abres la botella oyes &#x27;pssst&#x27;: son las burbujas saliendo de golpe.</div>
+      </div>
+      <div class="tarjeta">
+        <div class="foto">🍞🌾</div>
+        <h3>El pan</h3>
+        <p>El pan se hace con cuatro cosas sencillas y… ¡un poquito de paciencia!</p>
+        <ol class="pasos"><li>Se mezcla harina (que viene del trigo molido) con agua, sal y levadura.</li><li>Se amasa con las manos hasta tener una masa blandita.</li><li>Se deja reposar y la levadura hace que la masa crezca y se hinche.</li><li>Se mete en el horno muy caliente.</li><li>Sale doradito, crujiente por fuera y blandito por dentro.</li></ol>
+        <div class="dato">La levadura es la que hace que el pan crezca y tenga agujeritos por dentro.</div>
+      </div>
+      <div class="tarjeta">
+        <div class="foto">🍕🧀</div>
+        <h3>La pizza</h3>
+        <p>La pizza casera es facilísima y divertida de preparar. ¡Puedes ayudar a hacerla!</p>
+        <ol class="pasos"><li>Se hace una masa con harina, agua, levadura y un poco de sal y aceite.</li><li>Se estira la masa con las manos o un rodillo hasta dejarla redonda y plana.</li><li>Se pone salsa de tomate por encima.</li><li>Se añade queso y lo que más te guste: jamón, champiñones, maíz…</li><li>Al horno muy caliente hasta que el queso se derrite y burbujea.</li></ol>
+        <div class="dato">En Italia, de donde viene la pizza, hay cocineros que lanzan la masa al aire para estirarla.</div>
+      </div>
+      <div class="tarjeta">
+        <div class="foto">🍿🌽</div>
+        <h3>Las palomitas de maíz</h3>
+        <p>¡Las palomitas explotan! Por eso hacen &#x27;pop, pop, pop&#x27;. Te cuento por qué.</p>
+        <ol class="pasos"><li>Se cogen granos de maíz especial, pequeños y duros.</li><li>Cada grano tiene una gotita de agua escondida dentro.</li><li>Al calentarlos mucho en una olla o en el microondas, el agua se convierte en vapor.</li><li>El vapor empuja con tanta fuerza que… ¡PUM!, el grano explota y se da la vuelta.</li><li>Así aparece la palomita blanca y esponjosa.</li></ol>
+        <div class="dato">El ruido &#x27;pop&#x27; es el granito de maíz explotando por dentro. ¡Como un mini petardo!</div>
+      </div>
+      <div class="tarjeta">
+        <div class="foto">🧀🐄</div>
+        <h3>El queso</h3>
+        <p>El queso se hace con leche. ¡La leche se vuelve sólida como por arte de magia!</p>
+        <ol class="pasos"><li>Se empieza con leche de vaca, cabra u oveja.</li><li>Se le añade algo especial que hace que la leche se ponga espesa y se corte.</li><li>La parte sólida (se llama cuajada) se separa del líquido.</li><li>Se le da forma apretándola en moldes.</li><li>Algunos quesos se dejan descansar semanas o meses hasta que están listos.</li></ol>
+        <div class="dato">Cuanto más tiempo descansa un queso, más fuerte es su sabor.</div>
+      </div>
+      <div class="tarjeta">
+        <div class="foto">📄🌳</div>
+        <h3>El papel</h3>
+        <p>El papel donde dibujas viene… ¡de los árboles! Te cuento cómo se transforma.</p>
+        <ol class="pasos"><li>Se cortan trozos de madera y se trituran en pedacitos muy pequeños.</li><li>Se mezclan con mucha agua hasta hacer una papilla blandita.</li><li>Esa papilla se extiende en capas muy finas.</li><li>Se aprieta y se seca para quitar toda el agua.</li><li>Queda una hoja lisa y blanca lista para dibujar.</li></ol>
+        <div class="dato">Por eso es bueno reciclar papel: ¡así no hay que cortar tantos árboles!</div>
+      </div>
+      <div class="tarjeta">
+        <div class="foto">✏️🌈</div>
+        <h3>Los lápices de colores</h3>
+        <p>Cada lápiz de color guarda un secreto en su interior. ¡Vamos a verlo!</p>
+        <ol class="pasos"><li>Se mezclan polvos de colores con un poco de cera y arcilla.</li><li>Esa mezcla se aprieta hasta formar una barrita finita y de color: la mina.</li><li>Se hace un palito de madera con un huequito en el centro.</li><li>Se mete la mina de color dentro de la madera.</li><li>Se pinta el lápiz por fuera del mismo color que pinta por dentro.</li></ol>
+        <div class="dato">El color del lápiz por fuera te dice de qué color pinta por dentro. ¡Muy útil!</div>
+      </div>
+  </section>
+
+  <!-- ANIMALES -->
+  <section class="pagina" id="animales">
+    <h2 class="titulo">🦖 Animales y Dinosaurios</h2>
+    <div class="grid2">
+      <div class="tarjeta"><div class="foto">🦖</div><h3>Tyrannosaurus Rex</h3><p>El "rey de los dinosaurios". Enorme y con dientes del tamaño de un plátano. ¡Pero sus brazos eran pequeñitos!</p></div>
+      <div class="tarjeta"><div class="foto">🦕</div><h3>Diplodocus</h3><p>Tenía un cuello larguísimo para comer hojas altas. Era tan largo como tres autobuses.</p></div>
+    </div>
+    <div class="grid2">
+      <div class="tarjeta"><div class="foto">🦁</div><h3>El león</h3><p>El "rey de la selva". El macho tiene una gran melena. Viven en grupos llamados manadas.</p></div>
+      <div class="tarjeta"><div class="foto">🐘</div><h3>El elefante</h3><p>El animal terrestre más grande. Usa la trompa para beber, oler y agarrar cosas.</p></div>
+    </div>
+    <div class="grid2">
+      <div class="tarjeta"><div class="foto">🐆</div><h3>El guepardo</h3><p>¡El animal más rápido! Corre hasta 100 km por hora, como un coche por la ciudad.</p></div>
+      <div class="tarjeta"><div class="foto">🐬</div><h3>El delfín</h3><p>Muy listo y juguetón. Habla con silbidos y sonidos bajo el agua.</p></div>
+    </div>
+    <div class="dato">Los dinosaurios vivieron hace muchííísimos años, mucho antes que las personas.</div>
+  </section>
+
+  <!-- CURIOSIDADES -->
+  <section class="pagina" id="curiosi">
+    <h2 class="titulo">🤯 Curiosidades</h2>
+    <div class="tarjeta">
+      <h3>¿Sabías que...?</h3>
+      <ul>
+        <li>🐙 Los pulpos tienen <b>tres corazones</b> y sangre azul.</li>
+        <li>🍯 La miel <b>nunca se pone mala</b>.</li>
+        <li>🦒 La jirafa tiene <b>siete</b> huesos en el cuello, los mismos que tú.</li>
+        <li>🌈 El arcoíris aparece cuando el sol brilla mientras llueve.</li>
+        <li>🚀 En el espacio no se puede oír nada porque no hay aire.</li>
+        <li>🐝 Las abejas bailan para decir dónde hay flores.</li>
+        <li>😴 Los caballos pueden dormir de pie.</li>
+        <li>🦈 Los tiburones existían antes que los árboles.</li>
+        <li>🌍 La Tierra gira muy rápido, ¡pero no lo notamos!</li>
+        <li>🐜 Una hormiga puede cargar cosas mucho más pesadas que ella.</li>
+      </ul>
+    </div>
+    <div class="dato">¡El que pregunta, aprende! Cada día puedes descubrir algo nuevo.</div>
+  </section>
+
+  <!-- CUENTOS -->
+  <section class="pagina" id="cuentos">
+    <h2 class="titulo">📚 Cuentos</h2>
+    <div class="tarjeta"><p>20 cuentos cortitos, de unos 3 minutos cada uno. Toca el que quieras para leerlo. ¡Perfectos para antes de dormir! 🌙</p></div>
+    <div class="cuentos-lista"><button class="cuento-btn" onclick="abrirCuento(0)"><span class="cuento-emoji">⚽</span><span>El balón que quería volar</span></button><button class="cuento-btn" onclick="abrirCuento(1)"><span class="cuento-emoji">🌰</span><span>La avellana valiente</span></button><button class="cuento-btn" onclick="abrirCuento(2)"><span class="cuento-emoji">🧤</span><span>El portero sin miedo</span></button><button class="cuento-btn" onclick="abrirCuento(3)"><span class="cuento-emoji">⭐</span><span>La estrella de La Masia</span></button><button class="cuento-btn" onclick="abrirCuento(4)"><span class="cuento-emoji">🦕</span><span>El dinosaurio que no rugía</span></button><button class="cuento-btn" onclick="abrirCuento(5)"><span class="cuento-emoji">💧</span><span>La gota de agua viajera</span></button><button class="cuento-btn" onclick="abrirCuento(6)"><span class="cuento-emoji">🦁</span><span>El león que tenía miedo del ratón</span></button><button class="cuento-btn" onclick="abrirCuento(7)"><span class="cuento-emoji">🥅</span><span>El gol del último minuto</span></button><button class="cuento-btn" onclick="abrirCuento(8)"><span class="cuento-emoji">🐝</span><span>La abeja Zumbidos y la flor</span></button><button class="cuento-btn" onclick="abrirCuento(9)"><span class="cuento-emoji">🍫</span><span>El chocolate mágico</span></button><button class="cuento-btn" onclick="abrirCuento(10)"><span class="cuento-emoji">🐧</span><span>El pingüino que quería tomar el sol</span></button><button class="cuento-btn" onclick="abrirCuento(11)"><span class="cuento-emoji">👕</span><span>La camiseta número 10</span></button><button class="cuento-btn" onclick="abrirCuento(12)"><span class="cuento-emoji">🐘</span><span>El elefante que perdió su trompa imaginaria</span></button><button class="cuento-btn" onclick="abrirCuento(13)"><span class="cuento-emoji">🐌</span><span>La carrera del caracol</span></button><button class="cuento-btn" onclick="abrirCuento(14)"><span class="cuento-emoji">⛵</span><span>El barco de papel</span></button><button class="cuento-btn" onclick="abrirCuento(15)"><span class="cuento-emoji">🐢</span><span>La tortuga que llevaba su casa a cuestas</span></button><button class="cuento-btn" onclick="abrirCuento(16)"><span class="cuento-emoji">🚦</span><span>El semáforo que se aburría</span></button><button class="cuento-btn" onclick="abrirCuento(17)"><span class="cuento-emoji">☁️</span><span>La nube despistada</span></button><button class="cuento-btn" onclick="abrirCuento(18)"><span class="cuento-emoji">🌳</span><span>El árbol que daba abrazos</span></button><button class="cuento-btn" onclick="abrirCuento(19)"><span class="cuento-emoji">👟</span><span>Los zapatos de fútbol mágicos</span></button></div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="pagina" id="quiz">
+    <h2 class="titulo">🎮 Quiz de Fútbol</h2>
+    <div id="marcador">Pregunta <span id="actual">1</span> de <span id="total">8</span> · Aciertos: <span id="puntos">0</span></div>
+    <div class="tarjeta" id="caja-pregunta">
+      <div class="pregunta-num" id="numpreg"></div>
+      <h3 id="texto-pregunta"></h3>
+      <div id="opciones"></div>
+    </div>
+    <div class="tarjeta" id="resultado" style="display:none;"></div>
+  </section>
+
+</main>
+
+<!-- MODAL CUENTO -->
+<div id="modal" onclick="if(event.target===this)cerrarCuento()">
+  <div class="modal-box">
+    <button class="cerrar" onclick="cerrarCuento()">×</button>
+    <div class="cemoji" id="m-emoji"></div>
+    <h3 id="m-titulo"></h3>
+    <div id="m-texto"></div>
+    <button class="btn" onclick="cerrarCuento()">Cerrar 📖</button>
+  </div>
+</div>
+
+<footer>Hecho con ⚽ y mucho cariño para Lorenzo · 💛</footer>
+
+<script>
+/* PESTAÑAS */
+const tabs=document.querySelectorAll('.tab');
+const pags=document.querySelectorAll('.pagina');
+tabs.forEach(t=>{
+  t.addEventListener('click',()=>{
+    tabs.forEach(x=>x.classList.remove('activa'));
+    pags.forEach(p=>p.classList.remove('activa'));
+    t.classList.add('activa');
+    document.getElementById(t.dataset.pag).classList.add('activa');
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+});
+
+/* CUENTOS */
+const CUENTOS=[{"t": "El balón que quería volar", "e": "⚽", "x": "Había una vez un balón de fútbol llamado Pelusa que vivía en un cesto, en el rincón de un colegio. Todos los días veía a los niños correr y reír en el patio, y soñaba con algo más: Pelusa quería volar muy alto, tan alto como los pájaros.\n\nUna mañana, un niño llamado Lorenzo lo cogió y lo llevó al campo. «Hoy vamos a jugar un partido importante», le dijo. Pelusa estaba nervioso y feliz a la vez. Empezó el partido y los niños lo pasaban de un lado a otro. ¡Cómo corría Pelusa por la hierba!\n\nDe repente, Lorenzo le dio una patada muy fuerte. Pelusa subió, subió y subió por el aire. Por un momento, sintió que volaba de verdad. Vio el campo desde arriba, vio a los niños pequeñitos y vio el cielo azul muy cerca. «¡Estoy volando!», pensó muy contento.\n\nLuego bajó despacito y entró en la portería. ¡GOOOL! Todos los niños gritaron de alegría y abrazaron a Lorenzo. Pelusa entendió entonces que no necesitaba alas para volar: cada vez que alguien lo chutaba con cariño, él volaba un poquito. Y así, jugando, Pelusa fue el balón más feliz del mundo."}, {"t": "La avellana valiente", "e": "🌰", "x": "En lo alto de un árbol vivía una avellana llamada Avel. Era pequeñita y marrón, y tenía un poco de miedo de todo. Sus hermanas le decían: «Algún día caerás del árbol y empezará tu aventura». Pero Avel no quería caer. Le daba miedo lo desconocido.\n\nUn día de viento, ¡plof!, Avel se soltó de la rama y cayó sobre la hierba. «¡Ay, qué miedo!», dijo. Pero entonces conoció a una hormiga muy amable que la ayudó a rodar hasta un camino. «No tengas miedo», le dijo la hormiga. «Las mejores cosas pasan cuando te atreves».\n\nAvel rodó y rodó hasta llegar a una fábrica donde hacían crema de chocolate. Allí la lavaron, la tostaron con cuidado y la mezclaron con cacao y azúcar. Avel se convirtió en parte de un bote de crema riquísima.\n\nEsa misma semana, un niño llamado Lorenzo abrió el bote para desayunar y untó la crema en su pan. «¡Mmm, qué rica!», dijo sonriendo. Y aunque Avel ya no era una avellana en el árbol, se sintió feliz: había sido valiente, había vivido una aventura y ahora hacía sonreír a un niño. A veces, atreverse es la mejor idea."}, {"t": "El portero sin miedo", "e": "🧤", "x": "Tomás era el portero más pequeño de su equipo. Los demás niños eran más altos y más fuertes, y a veces se reían: «¿Tú vas a parar los goles? ¡Si eres muy chiquitín!». Tomás se ponía triste, pero no decía nada.\n\nLlegó el día de la gran final. El otro equipo tenía un delantero altísimo que chutaba muy fuerte. Todos pensaban que Tomás no podría parar nada. Pero Tomás tenía un secreto: era muy rápido y muy valiente.\n\nEl partido estaba empatado y, en el último minuto, el delantero alto chutó con toda su fuerza hacia la portería. La pelota volaba como un cohete. Tomás respiró hondo, saltó con todas sus ganas y… ¡PLAF! Atrapó el balón entre sus manos. ¡Lo había parado!\n\nTodo el equipo corrió a abrazarlo. «¡Eres el mejor portero del mundo!», gritaban. Tomás aprendió ese día que no importa ser el más grande, sino tener corazón valiente. Y desde entonces, nadie volvió a reírse de su tamaño, porque el pequeño Tomás era un gigante en la portería."}, {"t": "La estrella de La Masia", "e": "⭐", "x": "En una escuela de fútbol muy especial llamada La Masia vivía un niño llamado Leo. Leo era el más pequeño de todos, tan pequeño que su entrenador a veces tenía que buscarlo entre los demás. Pero cuando Leo tocaba el balón, pasaba algo mágico.\n\nEl balón parecía pegado a su pie. Leo corría, giraba, esquivaba a todos los niños y… ¡gol! Nadie podía quitarle la pelota. «Este niño tiene un don», decían los entrenadores.\n\nLeo entrenaba todos los días, lloviera o hiciera sol. Mientras los demás descansaban, él seguía practicando regates contra la pared. No lo hacía para presumir, lo hacía porque le encantaba el fútbol con todo su corazón.\n\nPasaron los años y aquel niño pequeñito se convirtió en uno de los mejores futbolistas de la historia. Ganó muchísimos premios y emocionó a millones de personas en todo el mundo. Pero nunca olvidó La Masia, donde aprendió que el talento es importante, pero el trabajo y el cariño por lo que haces lo son todavía más."}, {"t": "El dinosaurio que no rugía", "e": "🦕", "x": "Hace muchísimos años, cuando los dinosaurios vivían en la Tierra, había un pequeño dinosaurio llamado Rex. Todos los dinosaurios rugían muy fuerte: «¡GROAAAR!». Pero Rex tenía un problema: cuando abría la boca para rugir, solo le salía un «pío» muy bajito, como el de un pajarito.\n\nLos otros dinosaurios se reían de él. «¿Qué clase de dinosaurio eres tú?», le decían. Rex se sentía muy triste y se escondía detrás de los árboles.\n\nUn día, un grupo de dinosaurios pequeños se perdió en el bosque y nadie los encontraba. Todos rugían buscándolos, pero los rugidos eran tan fuertes y todos a la vez que nadie se entendía. Entonces Rex tuvo una idea. Subió a una roca alta e hizo su «pío pío», un sonido suave y distinto a todos los demás.\n\nLos dinosaurios perdidos oyeron aquel sonido tan especial y lo siguieron hasta llegar a casa sanos y salvos. Todos felicitaron a Rex. «¡Tu voz nos ha salvado!», le dijeron. Rex aprendió que ser diferente no es malo: a veces, lo que te hace especial es justo lo que el mundo necesita."}, {"t": "La gota de agua viajera", "e": "💧", "x": "Gotita vivía en una nube blanca, muy alta en el cielo. Era una gota de agua curiosa que siempre quería saber qué había allá abajo, en la Tierra. Un día, la nube se puso muy gordita y pesada, y… ¡plic, plic, ploc!, empezó a llover. Gotita cayó al vacío.\n\n«¡Allá voy!», gritó emocionada mientras bajaba. Cayó sobre una montaña y se deslizó por un riachuelo. El agua la llevó por valles y prados, conoció a peces de colores y saludó a las plantas que bebían de ella.\n\nLuego llegó a un río grande, y del río al mar, un mar inmenso y azul. Gotita estaba feliz de haber visto tantas cosas. Pero entonces salió el sol y empezó a calentar. Gotita notó que se volvía ligera, muy ligera, y empezó a subir flotando por el aire.\n\nVolvió a subir hasta el cielo y se unió otra vez a una nube. «¡He dado la vuelta completa!», pensó. Y así, una y otra vez, Gotita viaja del cielo a la tierra y de vuelta al cielo. A eso los mayores lo llaman «el ciclo del agua», y gracias a él, nunca nos quedamos sin agua para beber."}, {"t": "El león que tenía miedo del ratón", "e": "🦁", "x": "Simba era el león más grande de toda la sabana. Tenía una melena enorme y un rugido que hacía temblar los árboles. Todos los animales lo respetaban. Pero Simba escondía un secreto muy gracioso: ¡le daban muchísimo miedo los ratones!\n\nUn día, mientras dormía la siesta bajo un árbol, un ratoncito llamado Pipo pasó corriendo por encima de su pata. Simba se despertó de un salto. «¡AAAH, un ratón!», gritó, y se subió a una roca temblando. Todos los animales se quedaron con la boca abierta. ¿El rey de la sabana, con miedo de algo tan pequeño?\n\nPipo, en vez de reírse, se acercó despacito. «No tengas miedo, no voy a hacerte nada. ¿Quieres que seamos amigos?». Simba, un poco avergonzado, bajó de la roca. «¿De verdad no muerdes?», preguntó. «¡Claro que no!», dijo Pipo.\n\nDesde aquel día, el león grande y el ratón pequeño se hicieron amigos inseparables. Simba aprendió que no hay que tener miedo de lo que no conocemos, y que los amigos pueden venir en todos los tamaños, incluso muy chiquititos."}, {"t": "El gol del último minuto", "e": "🥅", "x": "El equipo de Lorenzo perdía por un gol y solo quedaba un minuto para que acabara el partido. Todos estaban cansados y algunos niños empezaban a ponerse tristes. «Ya no podemos ganar», decía uno. Pero Lorenzo no se rindió.\n\n«¡Vamos, equipo! ¡Un minuto es mucho tiempo!», animó a sus compañeros. Cogió el balón y empezó a correr. Pasó a un niño, luego a otro, y vio a su amigo Marcos solo cerca de la portería. Sin pensarlo, le pasó el balón.\n\nMarcos controló la pelota, pero estaba muy nervioso. «¡Tú puedes, Marcos!», gritó Lorenzo. Marcos respiró hondo, chutó… y el balón entró justo por la esquina. ¡GOOOL! ¡Empate en el último segundo!\n\nTodo el equipo saltó de alegría. No habían ganado, pero tampoco habían perdido, y lo más importante: nunca se habían rendido. El entrenador les dijo: «Hoy estoy muy orgulloso de vosotros, no por el resultado, sino porque habéis luchado hasta el final juntos». Y eso, para Lorenzo, valía más que cualquier trofeo."}, {"t": "La abeja Zumbidos y la flor", "e": "🐝", "x": "Zumbidos era una abeja muy trabajadora que vivía en una colmena con miles de hermanas. Cada mañana salía volando a buscar néctar, ese jugo dulce que tienen las flores. Pero un día, todas las flores del campo se habían marchitado por el calor, y Zumbidos no encontraba ninguna.\n\nVoló y voló, cada vez más lejos, hasta que vio algo de color: una pequeña flor azul que crecía sola junto a una piedra. «¡Por fin!», dijo Zumbidos. La flor estaba un poco triste. «Nadie me visita nunca porque estoy muy escondida», le dijo.\n\nZumbidos recogió su néctar y, antes de irse, le prometió volver. Y cumplió su promesa: cada día visitaba a la florecita azul. Sin saberlo, al ir de flor en flor, Zumbidos llevaba el polen de un lado a otro y ayudaba a que nacieran flores nuevas.\n\nGracias a Zumbidos, pronto todo el campo se llenó de flores otra vez, ¡y la florecita azul ya no estaba sola! Por eso las abejas son tan importantes: cuando recogen néctar para hacer miel, también ayudan a que crezcan las plantas y los frutos que comemos. Son pequeñas, pero hacen un trabajo enorme."}, {"t": "El chocolate mágico", "e": "🍫", "x": "En un pueblo lejano había una chocolatería muy especial. La llevaba don Cacao, un señor con un bigote blanco que decía que su chocolate era mágico. «Cada onza de mi chocolate guarda una sonrisa», contaba a los niños.\n\nUn día llegó a la tienda una niña llamada Clara que estaba muy triste porque había discutido con su mejor amiga. Don Cacao le dio un trocito de su chocolate. «Pruébalo y comparte el resto con quien quieras», le dijo guiñándole un ojo.\n\nClara probó el chocolate y, ¡qué rico estaba! Entonces se acordó de su amiga. Cogió el trozo que le quedaba y fue corriendo a buscarla. «Toma, te he traído chocolate. Siento haber discutido contigo», le dijo. Su amiga sonrió y se abrazaron.\n\nClara volvió a la chocolatería para dar las gracias a don Cacao. «¿De verdad tu chocolate es mágico?», le preguntó. Don Cacao se rió: «La magia no está en el chocolate, está en compartirlo. Lo que compartes con cariño siempre vuelve en forma de sonrisa». Y Clara nunca lo olvidó."}, {"t": "El pingüino que quería tomar el sol", "e": "🐧", "x": "En un lugar muy frío, lleno de hielo y nieve, vivía un pingüino llamado Pin. Mientras todos los pingüinos jugaban en la nieve y se tiraban por los toboganes de hielo, Pin soñaba con algo distinto: quería tomar el sol en una playa de arena calentita.\n\n«¡Eso es imposible!», le decían sus amigos. «Los pingüinos vivimos en el frío». Pero Pin era muy cabezota. Un día se subió a un trozo de hielo flotante y se dejó llevar por el mar. Navegó muchos días hasta que llegó a una isla con palmeras y arena dorada.\n\n«¡Por fin, una playa!», dijo feliz. Se tumbó en la arena y cerró los ojos. Pero pronto empezó a sentir mucho, muchísimo calor. «¡Uf, qué calor tan grande!». Pin se dio cuenta de que su cuerpo estaba hecho para el frío, no para tanto sol.\n\nAsí que volvió a su trozo de hielo y regresó a casa, donde sus amigos lo recibieron con un abrazo. Pin se tiró por el tobogán de hielo y se rió con ganas. «No hay nada como estar en casa», pensó. Había cumplido su sueño y, además, había aprendido a querer su hogar tal y como era."}, {"t": "La camiseta número 10", "e": "👕", "x": "En el armario de un vestuario colgaba una camiseta especial: la número 10. Era la camiseta que llevaban los jugadores más mágicos, los que inventaban jugadas que dejaban a todos con la boca abierta. La camiseta estaba muy orgullosa de su número.\n\nUn día, un niño nuevo llegó al equipo. Se llamaba Hugo y era muy tímido. El entrenador le dijo: «Hugo, hoy llevarás tú la camiseta número 10». Hugo se asustó. «Pero yo no soy tan bueno, esa camiseta es para los cracks», dijo bajito.\n\nLa camiseta, que podía escuchar, le susurró: «No tengas miedo, Hugo. Yo no hago mágico al que me lleva. Es el que me lleva quien me hace mágica a mí. Solo tienes que jugar con alegría».\n\nHugo se puso la camiseta y salió al campo. Al principio jugó con miedo, pero poco a poco se fue soltando, sonriendo y disfrutando. Hizo un pase precioso y ayudó a su equipo. Al final del partido, Hugo entendió las palabras de la camiseta: lo importante no era el número, sino las ganas y el corazón que ponía al jugar."}, {"t": "El elefante que perdió su trompa imaginaria", "e": "🐘", "x": "Elmer era un elefante muy juguetón al que le encantaba usar su trompa para todo: para beber agua, para darse duchas, para coger cacahuetes y para abrazar a sus amigos. Su trompa era lo que más quería en el mundo.\n\nUna mañana se despertó y, jugando, imaginó que había perdido su trompa. «¿Y si un día no la tengo? ¿Cómo bebería? ¿Cómo abrazaría a mamá?». Elmer se puso muy triste solo de pensarlo, y se quedó quieto sin querer jugar.\n\nSu mamá lo vio y le preguntó qué le pasaba. Elmer le contó su preocupación. La mamá elefanta sonrió con cariño. «Mi pequeño, no debes ponerte triste por cosas que no han pasado. Tu trompa está aquí, ¿lo ves?». Y le acarició con su propia trompa.\n\nElmer se rió al notar las cosquillas. Se dio cuenta de que estaba triste por algo que solo existía en su imaginación, mientras se perdía el día tan bonito que tenía delante. «Tienes razón, mamá». Y salió corriendo a jugar con sus amigos, dándose duchas de agua y disfrutando de cada momento. Porque lo importante es ser feliz con lo que tenemos hoy."}, {"t": "La carrera del caracol", "e": "🐌", "x": "Todos los animales del jardín iban a hacer una carrera. El conejo, el ratón, la lagartija y hasta el saltamontes se prepararon en la línea de salida. Y al final de todos, muy despacito, llegó Caracolín, el caracol. «¿Tú también vas a correr?», se rieron los demás. «¡Si eres lentísimo!».\n\nCaracolín no se enfadó. «Yo voy a participar igual, aunque llegue el último. Lo importante es intentarlo», dijo tranquilo. Sonó la señal y todos salieron disparados. El conejo iba el primero, rapidísimo. Caracolín apenas se movía de la salida.\n\nPero en el camino había sorpresas. El conejo se paró a comer zanahorias y se quedó dormido. El ratón se asustó de un gato y se escondió. La lagartija se distrajo persiguiendo una mosca. Mientras tanto, Caracolín seguía avanzando, despacito pero sin parar nunca.\n\nPoco a poco, Caracolín fue adelantando a todos y, para sorpresa de todos, ¡cruzó la meta el primero! «¿Cómo lo has hecho?», le preguntaron. Caracolín sonrió: «No corrí rápido, pero nunca me detuve». Y así aprendieron todos que con constancia y sin rendirse, hasta el más lento puede ganar."}, {"t": "El barco de papel", "e": "⛵", "x": "Un día de lluvia, Lorenzo no podía salir a jugar al fútbol al patio. Estaba un poco aburrido mirando por la ventana cómo caían las gotas. Entonces su abuelo se acercó con una hoja de papel. «¿Quieres que te enseñe a hacer un barco?», le preguntó.\n\nDoblando el papel con paciencia, el abuelo hizo un precioso barquito blanco. «Ahora viene lo divertido», dijo. Salieron al portal y pusieron el barquito en un charco grande de la calle. El barco empezó a navegar empujado por el agua de la lluvia.\n\nLorenzo lo seguía corriendo y riendo. El barquito viajó por el charco, pasó por debajo de una rama y siguió su camino por un pequeño riachuelo que se formaba junto a la acera. «¡Es como un barco de verdad en un mar de verdad!», gritaba Lorenzo emocionado.\n\nCuando dejó de llover, el barquito se quedó descansando en un charco. Lorenzo lo guardó como un tesoro. Aquella tarde aprendió que no siempre se necesitan juguetes caros para pasarlo bien: a veces, una hoja de papel, un charco y un abuelo con paciencia son la mejor aventura del mundo."}, {"t": "La tortuga que llevaba su casa a cuestas", "e": "🐢", "x": "Tola era una tortuga que vivía cerca de un estanque. A veces se cansaba de llevar siempre su pesado caparazón a todas partes. «¡Qué suerte tienen los demás animales!», pensaba. «El pájaro vuela ligero, el conejo salta libre, y yo siempre cargando esta casa tan pesada».\n\nUn día decidió pedirle al sabio búho que la ayudara a quitarse el caparazón. El búho la miró con sus grandes ojos. «¿Estás segura, Tola? Piénsalo bien». Pero Tola insistió tanto que el búho le dijo: «Está bien, mañana te ayudaré».\n\nEsa noche se levantó una tormenta enorme, con truenos y rayos. Todos los animales corrían a buscar refugio bajo las hojas. Pero Tola, en cambio, solo tuvo que meterse dentro de su caparazón. Allí dentro estaba calentita, seca y a salvo, mientras fuera caía la lluvia.\n\nA la mañana siguiente, Tola fue a ver al búho. «He cambiado de opinión», le dijo sonriendo. «Mi caparazón no es una carga, ¡es mi casa, mi refugio y mi protección! Lo llevo a todas partes y siempre me cuida». Y desde entonces, Tola se sintió la tortuga más afortunada del estanque."}, {"t": "El semáforo que se aburría", "e": "🚦", "x": "En una esquina de la ciudad había un semáforo llamado Lucho. Todo el día hacía lo mismo: rojo, amarillo, verde, rojo, amarillo, verde. Lucho se aburría muchísimo. «Siempre los mismos colores, ¡qué rollo!», se quejaba.\n\nUn día decidió que iba a hacer algo diferente. «¡Hoy voy a poner los colores como yo quiera!». Y empezó a encender luces sin orden: verde y rojo a la vez, luego los tres juntos, luego ninguno. ¡Menudo lío se armó! Los coches no sabían si parar o seguir, las personas no sabían cuándo cruzar. Todo era un caos.\n\nUn niño que iba a cruzar la calle se quedó parado, confundido y un poco asustado. Lucho lo vio y se dio cuenta del problema que había causado. «¡Oh, no! Por aburrirme he puesto a todos en peligro».\n\nRápidamente, Lucho volvió a su orden de siempre: rojo para parar, verde para pasar. Poco a poco todo se calmó y el niño pudo cruzar tranquilo y seguro. Lucho entendió que su trabajo, aunque pareciera repetido, era muy importante: gracias a él, todos estaban a salvo. Y desde entonces hace su trabajo con orgullo, sabiendo que cuidar a los demás nunca es aburrido."}, {"t": "La nube despistada", "e": "☁️", "x": "Había una nube llamada Nubita que era muy, muy despistada. Siempre se olvidaba de las cosas. Las demás nubes viajaban juntas por el cielo, pero Nubita se quedaba atrás mirando los pájaros, o se iba por otro camino sin darse cuenta.\n\nUn día, todas las nubes se reunieron para llevar lluvia a un campo donde las plantas tenían mucha sed. «¡Vamos, Nubita, no te despistes!», le dijeron. Pero Nubita se quedó embobada mirando un arcoíris y, cuando se quiso dar cuenta, ¡las demás nubes ya se habían ido sin ella!\n\nNubita se asustó. «¿Y ahora qué hago yo sola?». Miró hacia abajo y vio un jardincito pequeño, justo debajo de ella, donde una niña regaba unas flores que estaban muy mustias y tristes. La niña miraba al cielo deseando que lloviera.\n\nNubita pensó: «¡Puedo ayudar yo sola!». Se concentró mucho, se puso gordita y dejó caer una lluvia suave y fresquita sobre el jardín. Las flores revivieron y la niña dio saltos de alegría. Nubita se sintió feliz y orgullosa. Aquel día aprendió que, aunque a veces se despistara, también podía hacer cosas maravillosas ella sola."}, {"t": "El árbol que daba abrazos", "e": "🌳", "x": "En el centro de un parque había un árbol muy viejo y muy grande llamado Roble. Tenía las ramas anchas y la sombra fresquita. Pero lo más especial de Roble era que le encantaba hacer feliz a la gente, aunque no sabía muy bien cómo, porque los árboles no pueden moverse de su sitio.\n\nUn día llegó al parque un niño llamado Lorenzo que estaba triste porque había perdido su partido de fútbol. Se sentó solo bajo las ramas de Roble, cabizbajo. El árbol quería consolarlo, así que movió suavemente sus hojas con la brisa, haciendo un sonido como un susurro: «shhh, shhh», como diciendo «tranquilo, todo está bien».\n\nLorenzo levantó la vista y vio cómo las hojas bailaban para él. Una hoja se soltó y cayó despacito sobre su mano, como si el árbol le diera un regalito. Lorenzo sonrió. Se levantó y abrazó el tronco de Roble con sus brazos. «Gracias, árbol», dijo.\n\nRoble se sintió el árbol más feliz del parque. Había descubierto su manera de abrazar: con su sombra, con su susurro y con su compañía silenciosa. Y desde entonces, cada niño que se sentaba triste bajo sus ramas se levantaba siempre con una sonrisa."}, {"t": "Los zapatos de fútbol mágicos", "e": "👟", "x": "Lorenzo encontró en una tienda unos zapatos de fútbol de color amarillo brillante. Eran preciosos y, en cuanto se los probó, sintió algo raro: ¡le daban muchas ganas de correr y jugar! El vendedor le dijo con una sonrisa: «Estos zapatos son mágicos, pero su magia solo funciona si pones todo tu esfuerzo».\n\nLorenzo se los puso para el siguiente partido. Y, efectivamente, ¡corría más rápido que nunca y marcaba goles increíbles! «¡Son los zapatos mágicos!», pensaba feliz. Estaba convencido de que toda la magia venía de ellos.\n\nUn día, justo antes de un partido importante, Lorenzo no encontraba sus zapatos amarillos. Los había olvidado en casa. «¡Sin mis zapatos mágicos no puedo jugar bien!», se lamentó. Pero su entrenador le dijo: «Juega igual, confía en ti». Lorenzo salió al campo con unos zapatos normales, nervioso pero decidido.\n\nY, para su sorpresa, ¡volvió a jugar genial! Corrió, regateó y marcó un gol precioso. Entonces lo entendió todo: la magia nunca había estado en los zapatos, sino en él mismo, en su esfuerzo y en sus ganas. Los zapatos solo le habían ayudado a creer en sí mismo. Y eso, esa confianza, sí que era de verdad mágico."}];
+function abrirCuento(i){
+  const c=CUENTOS[i];
+  document.getElementById('m-emoji').textContent=c.e;
+  document.getElementById('m-titulo').textContent=c.t;
+  const cont=document.getElementById('m-texto');
+  cont.innerHTML="";
+  c.x.split("\n\n").forEach(par=>{
+    const p=document.createElement('p'); p.textContent=par; cont.appendChild(p);
+  });
+  document.getElementById('modal').classList.add('abierto');
+  document.querySelector('.modal-box').scrollTop=0;
+}
+function cerrarCuento(){ document.getElementById('modal').classList.remove('abierto'); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape')cerrarCuento(); });
+
+/* QUIZ */
+const preguntas=[
+  {q:"¿En qué equipo se hizo famoso Leo Messi?",o:["FC Barcelona","Real Madrid","Pontevedra CF"],c:0},
+  {q:"¿Cuántos jugadores hay en el campo por equipo?",o:["7","11","15"],c:1},
+  {q:"¿De qué colores juega el FC Barcelona?",o:["Verde y blanco","Azul y grana","Naranja"],c:1},
+  {q:"¿Qué Mundial ganó la Selección Española?",o:["El de 2010","El de 1990","Ninguno"],c:0},
+  {q:"¿Quién puede tocar el balón con las manos?",o:["El delantero","El árbitro","El portero"],c:2},
+  {q:"¿Qué significa una tarjeta roja?",o:["Marcar gol","Salir del campo","Cambio de jugador"],c:1},
+  {q:"¿Cuántos Balones de Oro ha ganado Messi?",o:["3","8","1"],c:1},
+  {q:"¿Cómo se llama la escuela de jóvenes del Barça?",o:["La Masia","La Cantera Real","El Colegio"],c:0}
+];
+let i=0,puntos=0;
+const total=document.getElementById('total'),actual=document.getElementById('actual'),ptsEl=document.getElementById('puntos');
+const numpreg=document.getElementById('numpreg'),texto=document.getElementById('texto-pregunta'),opcionesDiv=document.getElementById('opciones');
+const caja=document.getElementById('caja-pregunta'),resultado=document.getElementById('resultado');
+total.textContent=preguntas.length;
+function mostrar(){
+  const p=preguntas[i];
+  actual.textContent=i+1; numpreg.textContent="Pregunta "+(i+1);
+  texto.textContent=p.q; opcionesDiv.innerHTML="";
+  p.o.forEach((op,idx)=>{const b=document.createElement('button');b.className="opcion";b.textContent=op;b.onclick=()=>responder(idx,b);opcionesDiv.appendChild(b);});
+}
+function responder(idx,boton){
+  const p=preguntas[i];const botones=opcionesDiv.querySelectorAll('.opcion');
+  botones.forEach(b=>b.disabled=true);
+  if(idx===p.c){boton.classList.add('correcta');puntos++;ptsEl.textContent=puntos;}
+  else{boton.classList.add('incorrecta');botones[p.c].classList.add('correcta');}
+  const sig=document.createElement('button');sig.className="btn";
+  sig.textContent=(i<preguntas.length-1)?"Siguiente ➜":"Ver resultado 🏆";
+  sig.onclick=()=>{i++;(i<preguntas.length)?mostrar():final();};
+  opcionesDiv.appendChild(sig);
+}
+function final(){
+  caja.style.display="none";resultado.style.display="block";
+  let cara,msg;
+  if(puntos===preguntas.length){cara="🏆🤩";msg="¡PERFECTO! Eres un crack del fútbol.";}
+  else if(puntos>=preguntas.length/2){cara="⚽😃";msg="¡Muy bien! Sabes un montón.";}
+  else{cara="💪😊";msg="¡Buen intento! Vuelve a jugar y mejorarás.";}
+  resultado.innerHTML=`<div class="foto">${cara}</div><h3>${msg}</h3><p style="text-align:center;font-size:1.2rem;font-weight:bold;">Aciertos: ${puntos} de ${preguntas.length}</p><button class="btn" onclick="reiniciar()">🔁 Jugar otra vez</button>`;
+  document.getElementById('marcador').textContent="¡Quiz terminado! Aciertos: "+puntos+" de "+preguntas.length;
+}
+function reiniciar(){
+  i=0;puntos=0;
+  document.getElementById('marcador').innerHTML='Pregunta <span id="actual">1</span> de <span id="total">'+preguntas.length+'</span> · Aciertos: <span id="puntos">0</span>';
+  resultado.style.display="none";caja.style.display="block";mostrar();
+}
+mostrar();
+</script>
+</body>
+</html>
